@@ -1,9 +1,31 @@
-import { toDataURL } from 'qrcode'
-let handler = async (m, { text, conn }) => {
-if (!text) throw `*اكتب كلام الي تبغاه يحول الى باركود 🧸*`
-conn.sendFile(m.chat, await toDataURL(text.slice(0, 2048), { scale: 8 }), 'qrcode.png', '¯\\_(BY:HODA_AND_MAHDI', m)
+let timeout = 60000
+let poin = 500
+let handler = async (m, { conn, command, usedPrefix }) => {
+    conn.tebakbendera = conn.tebakbendera ? conn.tebakbendera : {}
+    let id = m.chat
+    if (id in conn.tebakbendera) {
+        conn.reply(m.chat, '❐┃لم يتم الاجابة علي السؤال بعد┃❌ ❯', conn.tebakbendera[id][0])
+        throw false
+    }
+    let src = await (await fetch('https://gist.githubusercontent.com/marwangt/e884854ca3a54690419c4a2a389de55f/raw/85fbc98f871e64928411ab82df140c2c8659db85/%25D8%25A7%25D8%25AD%25D8%25B2%25D8%25B1.js')).json()
+  let json = src[Math.floor(Math.random() * src.length)]
+    let caption = `*${command.toUpperCase()}*
+  ❐↞┇الـوقـت⏳↞ *${(timeout / 1000).toFixed(2)} ┇
+  *استخدم .انسحب للأنسحاب*
+  ❐↞┇الـجـائـزة💰↞ ${poin} نقاط┇
+『𝑅𝐼𝑇𝐴🌸𝐵𝛩𝑇』
+     `.trim()
+    conn.tebakbendera[id] = [
+        await conn.sendFile(m.chat, json.img, '', caption, m),
+        json, poin,
+        setTimeout(() => {
+            if (conn.tebakbendera[id]) conn.reply(m.chat, `❮ ⌛┇انتهي الوقت┇⌛❯\n❐↞┇الاجـابـة✅↞ ${json.name}*┇`, conn.tebakbendera[id][0])
+            delete conn.tebakbendera[id]
+        }, timeout)
+    ]
 }
-handler.help = ['', 'code'].map(v => 'qr' + v + ' <teks>')
-handler.tags = ['tools']
-handler.command = /^qr(code)?|كود|باركود$/i
+handler.help = ['guessflag']
+handler.tags = ['game']
+handler.command = /^احزر/i
+
 export default handler
